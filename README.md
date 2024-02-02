@@ -1,36 +1,44 @@
 # ESP_SRW_WEB
 
 /*Libraries for WIFI and WEBSERVER*/
+
 #include <WiFi.h>
 #include <WebServer.h>
 
 /* Put your SSID & Password */
+
 const char* ssid = "ESP32";  // Enter SSID here
 const char* password = "12345678";  //Enter Password here
 
 /* Put IP Address details */
+
 IPAddress local_ip(192,168,1,1);
 IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 
 /*WEB SERVER PORT*/
+
 WebServer server(80);
 
 /*ESP SIGNAL GPIO5*/
+
 uint8_t motorSignal = 5;
 bool motorStatus = LOW;
 
 /*COMMUNICATION*/
+
 void setup() {
   Serial.begin(115200);
   pinMode(motorSignal, OUTPUT);
 
 /*AP settings*/
+
   WiFi.softAP(ssid, password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
   delay(100);
 
   /*SERVER START*/
+  
   server.on("/", handle_OnConnect);
 
   server.on("/motorOn", handle_motorOn);
@@ -50,6 +58,7 @@ void loop() {
 }
 
 /*BEGINNING STATE*/
+
 void handle_OnConnect() {
   motorStatus = LOW;
   Serial.println("GPIO5 Status: OFF");
@@ -57,6 +66,7 @@ void handle_OnConnect() {
 }
 
 /*ON SIGNAL*/
+
 void handle_motorOn() {
   motorStatus = HIGH;
   Serial.println("GPIO5 Status: ON");
@@ -64,17 +74,20 @@ void handle_motorOn() {
 }
 
 /*OFF SIGNAL*/
+
 void handle_motorOff() {
   motorStatus = LOW;
   Serial.println("GPIO5 Status: OFF");
   server.send(200, "text/html", SendHTML(false)); 
 }
 /*Prevent error*/
+
 void handle_NotFound(){
   server.send(404, "text/plain", "Not found");
 }
 
 /*HTML code render*/
+
 String SendHTML(uint8_t motorStat){
   String ptr = "<!DOCTYPE html> <html>\n";
   ptr +="<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
@@ -94,6 +107,7 @@ String SendHTML(uint8_t motorStat){
   ptr +="<h3>Using Access Point(AP) Mode</h3>\n";
   
   /*CONDITIONAL SWITCH RENDER*/
+  
   if(motorStat)
   {ptr +="<p>Motor Status: ON</p><a class=\"button button-off\" href=\"/motorOff\">OFF</a>\n";}
   else
